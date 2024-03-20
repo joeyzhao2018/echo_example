@@ -1,0 +1,33 @@
+service: echo-example
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: provided.al2
+  stage: dev
+  region: us-west-2
+
+package:
+  individually: true
+
+functions:
+  hello:
+    handler: bootstrap
+    package:
+      artifact: ./hello/asset-output/hello.zip
+    events:
+      - httpApi:
+          path: /hello
+          method: get
+    environment:
+      DD_TRACE_OTEL_ENABLED: true
+      DD_UNIVERSAL_INSTRUMENTATION: true
+
+plugins:
+  - serverless-plugin-datadog
+
+custom:
+  datadog:
+    addExtension: true
+    apiKey: ${env:DATADOG_API_KEY}
